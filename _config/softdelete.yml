@@ -1,0 +1,12 @@
+---
+Name: softdelete
+After:
+  - 'framework/*'
+  - 'cms/*'
+---
+ModelAdmin:
+  extensions:
+    - SoftDeleteModelAdmin
+SecurityAdmin:
+  extensions:
+    - SoftDeleteSecurityAdmin

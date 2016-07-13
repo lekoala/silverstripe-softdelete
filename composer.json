@@ -1,0 +1,28 @@
+{
+    "name": "lekoala/silverstripe-softdelete",
+    "description": "Soft delete extension for SilverStripe",
+    "type": "silverstripe-module",
+    "keywords": [
+        "silverstripe",
+        "module",
+        "delete",
+        "soft"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "LeKoala",
+            "email": "thomas@lekoala.be"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.8",
+        "silverstripe/framework": "~3.1"
+    },
+    "extra": {
+        "installer-name": "softdelete"
+    },
+    "support": {
+        "issues": "https://github.com/lekoala/silverstripe-softdelete/issues"
+    }
+}
