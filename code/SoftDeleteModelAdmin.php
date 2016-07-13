@@ -10,13 +10,21 @@ class SoftDeleteModelAdmin extends Extension
 
     public function updateList(&$list)
     {
-        $params = $this->owner->getRequest()->requestVar('q');
-
-        if (!empty($params['IncludeDeleted'])) {
+        if ($this->filtersOnDeleted()) {
             $list = $list->alterDataQuery(function(DataQuery $dq) {
                 $dq->setQueryParam('SoftDeletable.filter', false);
             });
         }
+    }
+
+    public function filtersOnDeleted()
+    {
+        $params = $this->owner->getRequest()->requestVar('q');
+
+        if (!empty($params['IncludeDeleted'])) {
+            return true;
+        }
+        return false;
     }
 
     public function updateSearchContext(&$context)
@@ -43,12 +51,15 @@ class SoftDeleteModelAdmin extends Extension
             $config->removeComponentsByType('GridFieldDeleteAction');
             $config->addComponent(new GridFieldSoftDeleteAction());
 
-             /* @var $cols GridFieldDataColumns */
-            $cols = $gridfield->getConfig()->getComponentByType('GridFieldDataColumns');
-            $displayedFields = $cols->getDisplayFields($gridfield);
-            $displayedFields['Deleted'] = 'Deleted';
-            $cols->setDisplayFields($displayedFields);
+            if ($this->filtersOnDeleted()) {
+                /* @var $cols GridFieldDataColumns */
+                $cols                       = $gridfield->getConfig()->getComponentByType('GridFieldDataColumns');
+                $displayedFields            = $cols->getDisplayFields($gridfield);
+                $displayedFields['Deleted'] = 'Deleted';
+                $cols->setDisplayFields($displayedFields);
+            }
         }
+
 
         return $form;
     }
