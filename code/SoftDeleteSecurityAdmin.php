@@ -25,6 +25,13 @@ class SoftDeleteSecurityAdmin extends Extension
 
             // No caution because soft :-)
             $form->Fields()->removeByName('MembersCautionText');
+
+            $bulkManager = $config->getComponentByType('GridFieldBulkManager');
+            if ($bulkManager) {
+                $bulkManager->removeBulkAction('delete');
+                $bulkManager->addBulkAction('softDelete', 'delete (soft)',
+                    'GridFieldBulkSoftDeleteEventHandler');
+            }
         }
 
         if ($groupSingl->hasExtension('Groups')) {
@@ -33,6 +40,13 @@ class SoftDeleteSecurityAdmin extends Extension
 
             $config->removeComponentsByType('GridFieldDeleteAction');
             $config->addComponent(new GridFieldSoftDeleteAction());
+
+            $bulkManager = $config->getComponentByType('GridFieldBulkManager');
+            if ($bulkManager) {
+                $bulkManager->removeBulkAction('delete');
+                $bulkManager->addBulkAction('softDelete', 'delete (soft)',
+                    'GridFieldBulkSoftDeleteEventHandler');
+            }
         }
     }
 }

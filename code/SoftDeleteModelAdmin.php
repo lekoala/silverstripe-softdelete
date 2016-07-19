@@ -51,6 +51,13 @@ class SoftDeleteModelAdmin extends Extension
             $config->removeComponentsByType('GridFieldDeleteAction');
             $config->addComponent(new GridFieldSoftDeleteAction());
 
+            $bulkManager = $config->getComponentByType('GridFieldBulkManager');
+            if ($bulkManager) {
+                $bulkManager->removeBulkAction('delete');
+                $bulkManager->addBulkAction('softDelete', 'delete (soft)',
+                    'GridFieldBulkSoftDeleteEventHandler');
+            }
+
             if ($this->filtersOnDeleted()) {
                 /* @var $cols GridFieldDataColumns */
                 $cols                       = $gridfield->getConfig()->getComponentByType('GridFieldDataColumns');
