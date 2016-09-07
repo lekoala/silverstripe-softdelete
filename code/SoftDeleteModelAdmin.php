@@ -4,6 +4,7 @@
  * More friendly usage in model admin
  *
  * @author Koala
+ * @property ModelAdmin $owner
  */
 class SoftDeleteModelAdmin extends Extension
 {

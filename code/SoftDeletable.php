@@ -4,7 +4,7 @@
  * Soft delete extension
  *
  * @author Koala
- * @property Member|LegalFile|SoftDeletable $owner
+ * @property Member|LegalFile|Company|SoftDeletable $owner
  * @property string $Deleted
  * @property int $DeletedByID
  * @method Member DeletedBy()

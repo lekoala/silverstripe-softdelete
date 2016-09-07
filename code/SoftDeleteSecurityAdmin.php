@@ -4,6 +4,7 @@
  * Add gridfield action to SecurityAdmin
  *
  * @author Koala
+ * @property SecurityAdmin $owner
  */
 class SoftDeleteSecurityAdmin extends Extension
 {
