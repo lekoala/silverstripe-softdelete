@@ -114,7 +114,12 @@ class GridFieldSoftDeleteAction implements GridField_ColumnProvider, GridField_A
             }
 
             $item->softDelete();
-            $gridField->getList()->remove($item);
+
+            $list = $gridField->getList();
+            // Remove from the list if it's a non destructive operation
+            if ($list instanceof HasManyList || $list instanceof ManyManyList) {
+                $list->remove($item);
+            }
         }
     }
 }
