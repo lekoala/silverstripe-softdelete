@@ -4,7 +4,7 @@
  * Soft delete extension
  *
  * @author Koala
- * @property Member|LegalFile|Company|SoftDeletable $owner
+ * @property Member|SoftDeletable $owner
  * @property string $Deleted
  * @property int $DeletedByID
  * @method Member DeletedBy()
@@ -27,6 +27,19 @@ class SoftDeletable extends DataExtension
         'forceDelete',
         'undoDelete',
     );
+
+    public static function listSoftDeletableClasses()
+    {
+        $arr         = array();
+        $dataobjects = ClassInfo::subclassesFor('DataObject');
+        foreach ($dataobjects as $dataobject) {
+            $singl = singleton($dataobject);
+            if ($singl->hasExtension('SoftDeletable')) {
+                $arr[$dataobject] = $dataobject;
+            }
+        }
+        return $arr;
+    }
 
     /**
      * Update any requests to limit the results to the current site
@@ -120,7 +133,7 @@ class SoftDeletable extends DataExtension
         }
 
         $this->owner->Deleted   = date('Y-m-d H:i:s');
-        $this->owner->DeletedBy = Member::currentUserID();
+        $this->owner->DeletedByID = Member::currentUserID();
         $this->owner->write();
 
         $this->owner->extend('onAfterSoftDelete', $this->owner);
@@ -129,7 +142,7 @@ class SoftDeletable extends DataExtension
     public function undoDelete()
     {
         $this->owner->Deleted   = null;
-        $this->owner->DeletedBy = -1;
+        $this->owner->DeletedByID = -1;
         $this->owner->write();
     }
 

@@ -22,13 +22,15 @@ class SoftDeleteSecurityAdmin extends Extension
             $config    = $gridfield->getConfig();
 
             $config->removeComponentsByType('GridFieldDeleteAction');
-            $config->addComponent(new GridFieldSoftDeleteAction());
+            if ($this->owner->config()->softdelete_from_list) {
+                $config->addComponent(new GridFieldSoftDeleteAction());
+            }
 
             // No caution because soft :-)
             $form->Fields()->removeByName('MembersCautionText');
 
             $bulkManager = $config->getComponentByType('GridFieldBulkManager');
-            if ($bulkManager) {
+            if ($bulkManager && $this->owner->config()->softdelete_from_bulk) {
                 $bulkManager->removeBulkAction('delete');
                 $bulkManager->addBulkAction('softDelete', 'delete (soft)',
                     'GridFieldBulkSoftDeleteEventHandler');
@@ -40,10 +42,12 @@ class SoftDeleteSecurityAdmin extends Extension
             $config    = $gridfield->getConfig();
 
             $config->removeComponentsByType('GridFieldDeleteAction');
-            $config->addComponent(new GridFieldSoftDeleteAction());
+            if ($this->owner->config()->softdelete_from_list) {
+                $config->addComponent(new GridFieldSoftDeleteAction());
+            }
 
             $bulkManager = $config->getComponentByType('GridFieldBulkManager');
-            if ($bulkManager) {
+            if ($bulkManager && $this->owner->config()->softdelete_from_bulk) {
                 $bulkManager->removeBulkAction('delete');
                 $bulkManager->addBulkAction('softDelete', 'delete (soft)',
                     'GridFieldBulkSoftDeleteEventHandler');
