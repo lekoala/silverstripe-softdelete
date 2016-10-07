@@ -15,6 +15,9 @@ class SoftDeleteModelAdmin extends Extension
             $list = $list->alterDataQuery(function(DataQuery $dq) {
                 $dq->setQueryParam('SoftDeletable.filter', false);
             });
+            if($this->onlyDeletedFilter()) {
+                $list = $list->where('Deleted IS NOT NULL');
+            }
         }
     }
 
@@ -23,6 +26,19 @@ class SoftDeleteModelAdmin extends Extension
         $params = $this->owner->getRequest()->requestVar('q');
 
         if (!empty($params['IncludeDeleted'])) {
+            return true;
+        }
+        if (!empty($params['OnlyDeleted'])) {
+            return true;
+        }
+        return false;
+    }
+
+    public function onlyDeletedFilter()
+    {
+        $params = $this->owner->getRequest()->requestVar('q');
+
+        if (!empty($params['OnlyDeleted'])) {
             return true;
         }
         return false;
@@ -37,6 +53,7 @@ class SoftDeleteModelAdmin extends Extension
         if ($singl->hasExtension('SoftDeletable')) {
             $fields->push(new CheckboxField('q[IncludeDeleted]',
                 'Include deleted'));
+            $fields->push(new CheckboxField('q[OnlyDeleted]', 'Only deleted'));
         }
     }
 

@@ -75,8 +75,16 @@ class SoftDeletable extends DataExtension
             $fields->removeByName('Deleted');
             $fields->removeByName('DeletedByID');
         } else {
-            $fields->makeFieldReadonly('Deleted');
-            $fields->makeFieldReadonly('DeletedByID');
+            $Deleted     = $fields->dataFieldByName('Deleted');
+            $DeletedByID = $fields->dataFieldByName('DeletedByID');
+
+            if ($Deleted) {
+                $fields->makeFieldReadonly('Deleted');
+            }
+
+            if ($DeletedByID) {
+                $fields->makeFieldReadonly('DeletedByID');
+            }
         }
     }
 
@@ -132,7 +140,7 @@ class SoftDeletable extends DataExtension
             throw new LogicException("DataObject::softDelete() called on a DataObject without an ID");
         }
 
-        $this->owner->Deleted   = date('Y-m-d H:i:s');
+        $this->owner->Deleted     = date('Y-m-d H:i:s');
         $this->owner->DeletedByID = Member::currentUserID();
         $this->owner->write();
 
@@ -141,7 +149,7 @@ class SoftDeletable extends DataExtension
 
     public function undoDelete()
     {
-        $this->owner->Deleted   = null;
+        $this->owner->Deleted     = null;
         $this->owner->DeletedByID = -1;
         $this->owner->write();
     }
