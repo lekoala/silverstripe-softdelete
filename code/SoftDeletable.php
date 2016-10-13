@@ -119,6 +119,23 @@ class SoftDeletable extends DataExtension
         }
     }
 
+    public function onBeforeWrite()
+    {
+        parent::onBeforeWrite();
+
+        // Check if this we could a duplicated email with a deleted member
+        if($this->owner instanceof Member && $this->owner->Email) {
+            $list = Member::get()->filter('Email',$this->owner->Email)->exclude('ID',$this->owner->ID);
+            $list = $list->alterDataQuery(function(DataQuery $dq) {
+                $dq->setQueryParam('SoftDeletable.filter', false);
+            });
+            $count = $list->count();
+            if($count > 1) {
+                throw new Exception("There is already a deleted member with this email");
+            }
+        }
+    }
+
     public function onBeforeDelete()
     {
         if (self::$prevent_delete) {
