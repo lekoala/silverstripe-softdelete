@@ -1,5 +1,13 @@
 <?php
 
+use SilverStripe\ORM\HasManyList;
+use SilverStripe\ORM\ManyManyList;
+use SilverStripe\ORM\ValidationException;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridField_FormAction;
+use SilverStripe\Forms\GridField\GridField_ActionProvider;
+use SilverStripe\Forms\GridField\GridField_ColumnProvider;
+
 /**
  * A GridField action to handle soft delete
  */
@@ -29,7 +37,7 @@ class GridFieldSoftDeleteAction implements GridField_ColumnProvider, GridField_A
      */
     public function getColumnAttributes($gridField, $record, $columnName)
     {
-        return array('class' => 'col-buttons');
+        return array('class' => 'grid-field__col-compact');
     }
 
     /**
@@ -76,15 +84,20 @@ class GridFieldSoftDeleteAction implements GridField_ColumnProvider, GridField_A
      */
     public function getColumnContent($gridField, $record, $columnName)
     {
-        if (!$record->canDelete()) return;
+        if (!$record->canDelete()) {
+            return;
+        }
 
-        $field = GridField_FormAction::create($gridField,
-                'SoftDeleteRecord'.$record->ID, false, "softdeleterecord",
-                array('RecordID' => $record->ID))
-            ->addExtraClass('gridfield-button-delete')
-            ->setAttribute('title', _t('GridAction.Delete', "Delete"))
-            ->setAttribute('data-icon', 'cross-circle')
-            ->setDescription(_t('GridAction.DELETE_DESCRIPTION', 'Delete'));
+        $field = GridField_FormAction::create(
+            $gridField,
+            'SoftDeleteRecord' . $record->ID,
+            false,
+            "softdeleterecord",
+            array('RecordID' => $record->ID)
+        )
+            ->addExtraClass('gridfield-button-delete btn--icon-md font-icon-trash-bin btn--no-text grid-field__icon-action')
+            ->setAttribute('title', _t(__class__ . '.Delete', "Delete"))
+            ->setDescription(_t(__class__ . '.DELETE_DESCRIPTION', 'Delete'));
 
         return $field->Field();
     }
@@ -98,9 +111,12 @@ class GridFieldSoftDeleteAction implements GridField_ColumnProvider, GridField_A
      * @param array $data - form data
      * @return void
      */
-    public function handleAction(GridField $gridField, $actionName, $arguments,
-                                 $data)
-    {
+    public function handleAction(
+        GridField $gridField,
+        $actionName,
+        $arguments,
+        $data
+    ) {
         if ($actionName == 'softdeleterecord') {
             $item = $gridField->getList()->byID($arguments['RecordID']);
             if (!$item) {
@@ -109,8 +125,12 @@ class GridFieldSoftDeleteAction implements GridField_ColumnProvider, GridField_A
 
             if (!$item->canDelete()) {
                 throw new ValidationException(
-                _t('GridFieldAction_Delete.DeletePermissionsFailure',
-                    "No delete permissions"), 0);
+                    _t(
+                        'GridFieldAction_Delete.DeletePermissionsFailure',
+                        "No delete permissions"
+                    ),
+                    0
+                );
             }
 
             $item->softDelete();

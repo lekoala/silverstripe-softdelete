@@ -1,5 +1,12 @@
 <?php
 
+use SilverStripe\Forms\Form;
+use SilverStripe\Core\Extension;
+use SilverStripe\Security\Group;
+use SilverStripe\Security\Member;
+use SilverStripe\Admin\SecurityAdmin;
+use SilverStripe\Forms\GridField\GridFieldDeleteAction;
+
 /**
  * Add gridfield action to SecurityAdmin
  *
@@ -8,49 +15,47 @@
  */
 class SoftDeleteSecurityAdmin extends Extension
 {
+    protected function getSanistedClass($class)
+    {
+        return str_replace('\\', '-', $class);
+    }
+
+    /**
+     * @return SecurityAdmin
+     */
+    protected function getSecurityAdmin()
+    {
+        return $this->owner;
+    }
 
     function updateEditForm(Form $form)
     {
         /* @var $owner SecurityAdmin */
         $owner = $this->owner;
 
-        $memberSingl = singleton('Member');
-        $groupSingl  = singleton('Group');
+        $memberSingl = singleton(Member::class);
+        $groupSingl = singleton(Group::class);
 
         if ($memberSingl->hasExtension('SoftDeletable')) {
             $gridfield = $form->Fields()->dataFieldByName('Members');
-            $config    = $gridfield->getConfig();
+            $config = $gridfield->getConfig();
 
-            $config->removeComponentsByType('GridFieldDeleteAction');
+            $config->removeComponentsByType(GridFieldDeleteAction::class);
             if ($this->owner->config()->softdelete_from_list) {
                 $config->addComponent(new GridFieldSoftDeleteAction());
             }
 
             // No caution because soft :-)
             $form->Fields()->removeByName('MembersCautionText');
-
-            $bulkManager = $config->getComponentByType('GridFieldBulkManager');
-            if ($bulkManager && $this->owner->config()->softdelete_from_bulk) {
-                $bulkManager->removeBulkAction('delete');
-                $bulkManager->addBulkAction('softDelete', 'delete (soft)',
-                    'GridFieldBulkSoftDeleteEventHandler');
-            }
         }
 
-        if ($groupSingl->hasExtension('Groups')) {
-            $gridfield = $form->Fields()->dataFieldByName('Members');
-            $config    = $gridfield->getConfig();
+        if ($groupSingl->hasExtension('SoftDeletable')) {
+            $gridfield = $form->Fields()->dataFieldByName('Groups');
+            $config = $gridfield->getConfig();
 
-            $config->removeComponentsByType('GridFieldDeleteAction');
+            $config->removeComponentsByType(GridFieldDeleteAction::class);
             if ($this->owner->config()->softdelete_from_list) {
                 $config->addComponent(new GridFieldSoftDeleteAction());
-            }
-
-            $bulkManager = $config->getComponentByType('GridFieldBulkManager');
-            if ($bulkManager && $this->owner->config()->softdelete_from_bulk) {
-                $bulkManager->removeBulkAction('delete');
-                $bulkManager->addBulkAction('softDelete', 'delete (soft)',
-                    'GridFieldBulkSoftDeleteEventHandler');
             }
         }
     }

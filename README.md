@@ -29,7 +29,7 @@ and click "Really delete" which will call "forceDelete" on the record.
 
 Compatibility
 ==================
-Tested with 3.x
+Tested with 4.x
 
 Maintainer
 ==================

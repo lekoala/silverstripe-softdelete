@@ -1,11 +1,13 @@
 <?php
 
+use SilverStripe\Dev\BuildTask;
+
 /**
  * @author Koala
  */
 class RecoverSoftDeletedRecordsTask extends BuildTask
 {
-    protected $title       = 'Recover Soft Deleted Records';
+    protected $title = 'Recover Soft Deleted Records';
     protected $description = 'Helps you to track and potentially recover any soft deleted record';
 
     public function run($request)
@@ -13,7 +15,7 @@ class RecoverSoftDeletedRecordsTask extends BuildTask
         $classes = SoftDeletable::listSoftDeletableClasses();
 
         $selectedClass = $request->getVar('class');
-        $recover       = $request->getVar('recover');
+        $recover = $request->getVar('recover');
 
         if (!$selectedClass) {
             DB::alteration_message("Please choose any of the following class and pass it as 'class' in the url");
@@ -31,24 +33,25 @@ class RecoverSoftDeletedRecordsTask extends BuildTask
         $toRecover = array();
         if ($recover) {
             if ($recover == 'all') {
-                
             } else {
                 $toRecover = array_map('trim', explode(',', $recover));
             }
         }
 
         SoftDeletable::$disable = true;
-        $records                = $selectedClass::get()->where('Deleted IS NOT NULL');
+        $records = $selectedClass::get()->where('Deleted IS NOT NULL');
         if (!$records->count()) {
             DB::alteration_message("No soft deleted records");
         }
         foreach ($records as $record) {
             if ($recover == 'all' || in_array($record->ID, $toRecover)) {
                 $record->undoDelete();
-                DB::alteration_message($record->getTitle()." (#".$record->ID.") has been recovered",
-                    'repaired');
+                DB::alteration_message(
+                    $record->getTitle() . " (#" . $record->ID . ") has been recovered",
+                    'repaired'
+                );
             } else {
-                DB::alteration_message($record->getTitle()." (#".$record->ID.") has been deleted at ".$record->Deleted.' by '.$record->DeletedBy()->Title);
+                DB::alteration_message($record->getTitle() . " (#" . $record->ID . ") has been deleted at " . $record->Deleted . ' by ' . $record->DeletedBy()->Title);
             }
         }
         if ($recover) {
