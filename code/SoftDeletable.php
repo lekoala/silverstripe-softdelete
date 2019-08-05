@@ -39,13 +39,16 @@ class SoftDeletable extends DataExtension
         'undoDelete',
     );
 
+    /**
+     * @return array
+     */
     public static function listSoftDeletableClasses()
     {
         $arr = array();
         $dataobjects = ClassInfo::subclassesFor(DataObject::class);
         foreach ($dataobjects as $dataobject) {
             $singl = singleton($dataobject);
-            if ($singl->hasExtension(SoftDeletable::class)) {
+            if ($singl->hasExtension(self::class)) {
                 $arr[$dataobject] = $dataobject;
             }
         }
