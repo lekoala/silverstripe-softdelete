@@ -6,6 +6,8 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\ORM\Queries\SQLSelect;
 use SilverStripe\Security\Member;
+use SilverStripe\ORM\DataObject;
+use LeKoala\Base\Actions\CustomAction;
 
 /**
  * Soft delete extension
@@ -20,6 +22,7 @@ class SoftDeletable extends DataExtension
 {
     public static $disable = false;
     public static $prevent_delete = true;
+
     private static $db = array(
         'Deleted' => "Datetime",
         'DeletedByID' => "Int", // Somehow relation to member class causes circular dependency
@@ -28,7 +31,7 @@ class SoftDeletable extends DataExtension
         // 'DeletedBy' => Member::class
     );
     private static $defaults = array(
-        'DeletedBy' => '-1' // Use -1 to distinguish null from 0
+        'DeletedByID' => '-1' // Use -1 to distinguish null from 0
     );
     private static $better_buttons_actions = array(
         'softDelete',
@@ -39,10 +42,10 @@ class SoftDeletable extends DataExtension
     public static function listSoftDeletableClasses()
     {
         $arr = array();
-        $dataobjects = ClassInfo::subclassesFor('DataObject');
+        $dataobjects = ClassInfo::subclassesFor(DataObject::class);
         foreach ($dataobjects as $dataobject) {
             $singl = singleton($dataobject);
-            if ($singl->hasExtension('SoftDeletable')) {
+            if ($singl->hasExtension(SoftDeletable::class)) {
                 $arr[$dataobject] = $dataobject;
             }
         }
@@ -94,7 +97,23 @@ class SoftDeletable extends DataExtension
 
     public function updateCMSActions(FieldList $actions)
     {
-        //TODO: currently, better buttons are mandatory
+        if (!class_exists(CustomAction::class)) {
+            // Need CustomAction (from lekoala/silverstripe-base) for this to work;
+            return;
+        }
+
+        if ($this->owner->Deleted) {
+            $undoDelete = new CustomAction('undoDelete', 'Undo Delete');
+            $actions->push($undoDelete);
+
+            $forceDelete = new CustomAction('forceDelete', 'Really Delete');
+            $forceDelete->addExtraClass('btn-danger');
+            $forceDelete->setConfirmation("Are you sure? There is no undo");
+            $actions->push($forceDelete);
+        } else {
+            $softDelete = new CustomAction('softDelete', 'Delete');
+            $actions->push($softDelete);
+        }
     }
 
     public function updateBetterButtonsActions(FieldList $actions)
@@ -191,5 +210,13 @@ class SoftDeletable extends DataExtension
         self::$prevent_delete = $status;
 
         return $result;
+    }
+
+    /**
+     * @return Member
+     */
+    public function DeletedBy()
+    {
+        return DataObject::get_by_id(Member::class, $this->owner->DeletedByID);
     }
 }

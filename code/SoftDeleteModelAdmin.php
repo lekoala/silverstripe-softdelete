@@ -61,7 +61,7 @@ class SoftDeleteModelAdmin extends Extension
 
         $singl = singleton($this->owner->modelClass);
 
-        if ($singl->hasExtension('SoftDeletable')) {
+        if ($singl->hasExtension(SoftDeletable::class)) {
             $fields->push(new CheckboxField('q[IncludeDeleted]', 'Include deleted'));
             $fields->push(new CheckboxField('q[OnlyDeleted]', 'Only deleted'));
         }
@@ -71,7 +71,7 @@ class SoftDeleteModelAdmin extends Extension
     {
         $singl = singleton($this->owner->modelClass);
 
-        if ($singl->hasExtension('SoftDeletable')) {
+        if ($singl->hasExtension(SoftDeletable::class)) {
             /* @var $gridfield GridField */
             $gridfield = $form->Fields()->dataFieldByName($this->getSanistedModelClass());
             $config = $gridfield->getConfig();
