@@ -124,11 +124,15 @@ class SoftDeletable extends DataExtension
             $actions->push($undoDelete);
 
             $forceDelete = new CustomAction('forceDelete', 'Really Delete');
-            $forceDelete->addExtraClass('btn-danger');
+            $forceDelete->setButtonType('outline-danger');
+            $forceDelete->addExtraClass('btn-hide-outline');
             $forceDelete->setConfirmation("Are you sure? There is no undo");
             $actions->push($forceDelete);
         } else {
             $softDelete = new CustomAction('softDelete', 'Delete');
+            $softDelete->setButtonType('outline-danger');
+            $softDelete->addExtraClass('btn-hide-outline');
+            $softDelete->addExtraClass('font-icon-trash-bin');
             $actions->push($softDelete);
         }
     }
