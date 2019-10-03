@@ -20,7 +20,18 @@ use LeKoala\Base\Actions\CustomAction;
  */
 class SoftDeletable extends DataExtension
 {
+    /**
+     * Disable the filtering
+     *
+     * @var boolean
+     */
     public static $disable = false;
+
+    /**
+     * Disable accidental deletation prevention
+     *
+     * @var boolean
+     */
     public static $prevent_delete = true;
 
     private static $db = array(

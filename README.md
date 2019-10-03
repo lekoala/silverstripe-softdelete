@@ -45,6 +45,17 @@ By default, the module will prevent any delete from happening. To allow deletion
 The only way from the CMS UI to delete a record is to go to a soft deleted record
 and click "Really delete" which will call "forceDelete" on the record.
 
+Disable filtering
+==================
+
+You can disable filtering globally, using
+
+    SoftDeletable::$disable = true
+
+Or at query level
+
+    $dataQuery->setQueryParam('SoftDeletable.filter',false)
+
 Compatibility
 ==================
 Tested with 4.x
