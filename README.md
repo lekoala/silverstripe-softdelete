@@ -17,6 +17,24 @@ Simply replace your calls from delete to softDelete.
 New extensions hooks are provided to avoid side effects (onBeforeSoftDelete, onAfterSoftDelete).
 These are ideals if you have child records that need to be soft deleted with their parent.
 
+Config options
+==================
+
+    SilverStripe\Admin\ModelAdmin:
+        softdelete_from_list: true
+        softdelete_from_list_exclude: []
+        extensions:
+            - SoftDeleteModelAdmin
+    SilverStripe\Admin\SecurityAdmin:
+        softdelete_from_list: true
+        softdelete_from_list_exclude: []
+        extensions:
+            - SoftDeleteSecurityAdmin
+
+You can configure:
+- softdelete_from_list: show delete button on a line. Enabled by default.
+- softdelete_from_list_exclude: hide the delete button for these classes even if enabled globally
+
 Prevent accidental deletion
 ==================
 
