@@ -78,7 +78,10 @@ class SoftDeleteModelAdmin extends Extension
 
             $config->removeComponentsByType(GridFieldDeleteAction::class);
             if ($this->owner->config()->softdelete_from_list) {
-                $config->addComponent(new GridFieldSoftDeleteAction());
+                $exclude = $this->owner->config()->softdelete_from_list_exclude;
+                if ($exclude && !in_array($this->owner->modelClass, $exclude)) {
+                    $config->addComponent(new GridFieldSoftDeleteAction());
+                }
             }
 
             if ($this->filtersOnDeleted()) {

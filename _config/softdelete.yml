@@ -3,9 +3,11 @@ Name: softdelete
 ---
 SilverStripe\Admin\ModelAdmin:
   softdelete_from_list: true
+  softdelete_from_list_exclude: []
   extensions:
     - SoftDeleteModelAdmin
 SilverStripe\Admin\SecurityAdmin:
   softdelete_from_list: true
+  softdelete_from_list_exclude: []
   extensions:
     - SoftDeleteSecurityAdmin
