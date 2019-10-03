@@ -115,7 +115,10 @@ class SoftDeletable extends DataExtension
             // Need CustomAction (from lekoala/silverstripe-base) for this to work;
             return;
         }
-
+        // Hide delete for new records
+        if (!$this->owner->ID) {
+            return;
+        }
         if ($this->owner->Deleted) {
             $undoDelete = new CustomAction('undoDelete', 'Undo Delete');
             $actions->push($undoDelete);
