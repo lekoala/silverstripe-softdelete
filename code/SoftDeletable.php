@@ -67,7 +67,7 @@ class SoftDeletable extends DataExtension
     }
 
     /**
-     * Update any requests to limit the results to the current site
+     * Update any requests to hide deleted records
      */
     public function augmentSQL(SQLSelect $query, DataQuery $dataQuery = null)
     {
@@ -189,6 +189,11 @@ class SoftDeletable extends DataExtension
         parent::onBeforeDelete();
     }
 
+    /**
+     * Soft delete a records (set Deleted and DeletedByID)
+     *
+     * @return void
+     */
     public function softDelete()
     {
         if ($this->owner->Deleted) {
@@ -209,6 +214,11 @@ class SoftDeletable extends DataExtension
         $this->owner->extend('onAfterSoftDelete', $this->owner);
     }
 
+    /**
+     * Undo delete
+     *
+     * @return void
+     */
     public function undoDelete()
     {
         $this->owner->Deleted = null;
@@ -216,6 +226,11 @@ class SoftDeletable extends DataExtension
         $this->owner->write();
     }
 
+    /**
+     * Do a real delete, overcoming prevent_delete state
+     *
+     * @return void
+     */
     public function forceDelete()
     {
         $status = self::$prevent_delete;
@@ -225,8 +240,6 @@ class SoftDeletable extends DataExtension
         $result = $this->owner->delete();
 
         self::$prevent_delete = $status;
-
-        return $result;
     }
 
     /**
