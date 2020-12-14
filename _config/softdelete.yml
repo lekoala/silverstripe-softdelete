@@ -11,3 +11,11 @@ SilverStripe\Admin\SecurityAdmin:
   softdelete_from_list_exclude: []
   extensions:
     - SoftDeleteSecurityAdmin
+---
+Name: softdelete-searchfilters
+After: '#coresearchfilters'
+---
+SilverStripe\Core\Injector\Injector:
+  DataListFilter.SoftDelete:
+    class: SoftDeleteSearchFilter
+  SoftDeleteSearchFilter: '%$DataListFilter.SoftDelete'

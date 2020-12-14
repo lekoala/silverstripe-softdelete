@@ -30,7 +30,6 @@ class SoftDeleteModelAdmin extends Extension
     public function filtersOnDeleted()
     {
         $params = $this->owner->getRequest()->requestVar('q');
-
         if (!empty($params['IncludeDeleted'])) {
             return true;
         }
@@ -53,18 +52,6 @@ class SoftDeleteModelAdmin extends Extension
     protected function getSanistedModelClass()
     {
         return str_replace('\\', '-', $this->owner->modelClass);
-    }
-
-    public function updateSearchContext(&$context)
-    {
-        $fields = $context->getFields();
-
-        $singl = singleton($this->owner->modelClass);
-
-        if ($singl->hasExtension(SoftDeletable::class)) {
-            $fields->push(new CheckboxField('q[IncludeDeleted]', 'Include deleted'));
-            $fields->push(new CheckboxField('q[OnlyDeleted]', 'Only deleted'));
-        }
     }
 
     public function updateEditForm($form)

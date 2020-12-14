@@ -2,12 +2,13 @@
 
 use SilverStripe\ORM\DataQuery;
 use SilverStripe\Core\ClassInfo;
-use SilverStripe\Forms\FieldList;
-use SilverStripe\ORM\DataExtension;
-use SilverStripe\ORM\Queries\SQLSelect;
-use SilverStripe\Security\Member;
 use SilverStripe\ORM\DataObject;
-use LeKoala\Base\Actions\CustomAction;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Security\Member;
+use SilverStripe\ORM\DataExtension;
+use LeKoala\CmsActions\CustomAction;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\ORM\Queries\SQLSelect;
 
 /**
  * Soft delete extension
@@ -44,11 +45,6 @@ class SoftDeletable extends DataExtension
     private static $defaults = array(
         'DeletedByID' => '-1' // Use -1 to distinguish null from 0
     );
-    private static $better_buttons_actions = array(
-        'softDelete',
-        'forceDelete',
-        'undoDelete',
-    );
 
     /**
      * @return array
@@ -64,6 +60,29 @@ class SoftDeletable extends DataExtension
             }
         }
         return $arr;
+    }
+
+    public function updateSearchableFields(array &$fields)
+    {
+        /*
+^ array:4 [▼
+  "Title" => array:2 [▼
+    "title" => "Name"
+    "filter" => "PartialMatchFilter"
+  ]
+  ...
+        */
+        $fields['IncludeDeleted'] = [
+            'filter' => 'SoftDeleteSearchFilter',
+            'field' => CheckboxField::class,
+            'title' => 'Include deleted',
+        ];
+        // Can can declare search filters instance directly with our modifier
+        $fields['OnlyDeleted'] = [
+            'filter' => new SoftDeleteSearchFilter('Deleted', 1, ['only']),
+            'field' => CheckboxField::class,
+            'title' => 'Only deleted',
+        ];
     }
 
     /**
@@ -111,10 +130,6 @@ class SoftDeletable extends DataExtension
 
     public function updateCMSActions(FieldList $actions)
     {
-        if (!class_exists(CustomAction::class)) {
-            // Need CustomAction (from lekoala/silverstripe-base) for this to work;
-            return;
-        }
         // Hide delete for new records
         if (!$this->owner->ID) {
             return;
@@ -137,32 +152,42 @@ class SoftDeletable extends DataExtension
         }
     }
 
-    public function updateBetterButtonsActions(FieldList $actions)
+    /**
+     * @param FieldList $actions
+     * @return void
+     */
+    public function onAfterUpdateCMSActions($actions)
     {
-        foreach ($actions as $action) {
-            if (get_class($action) == 'BetterButton_Delete') {
-                $actions->remove($action);
-
-                if ($this->owner->Deleted) {
-                    $actions->push($undo = new BetterButtonCustomAction(
-                        'undoDelete',
-                        'Undo delete'
-                    ));
-
-                    $actions->push($delete = new BetterButtonCustomAction(
-                        'forceDelete',
-                        'Really Delete'
-                    ));
-                    $delete->setConfirmation("Are you sure? There is no undo");
-
-                    $delete->addExtraClass('gridfield-better-buttons-delete');
-                } else {
-                    $actions->push($delete = new BetterButtonCustomAction(
-                        'softDelete',
-                        'Delete'
-                    ));
-
-                    $delete->addExtraClass('gridfield-better-buttons-delete');
+        $RightGroup = $actions->fieldByName('RightGroup');
+        $deleteAction = $actions->fieldByName('action_doDelete');
+        $undoDelete = $actions->fieldByName('action_doCustomAction[undoDelete]');
+        $forceDelete = $actions->fieldByName('action_doCustomAction[forceDelete]');
+        $softDelete = $actions->fieldByName('action_doCustomAction[softDelete]');
+        if ($softDelete) {
+            if ($deleteAction) {
+                $actions->remove($deleteAction);
+            }
+            if ($RightGroup) {
+                // Move at the end of the stack
+                $actions->remove($softDelete);
+                $actions->push($softDelete);
+                // Without this positionning fails and button is stuck near +
+                if ($RightGroup) {
+                    $softDelete->addExtraClass('default-position');
+                }
+            }
+        }
+        if ($forceDelete) {
+            if ($deleteAction) {
+                $actions->remove($deleteAction);
+            }
+            if ($RightGroup) {
+                // Move at the end of the stack
+                $actions->remove($forceDelete);
+                $actions->push($forceDelete);
+                // Without this positionning fails and button is stuck near +
+                if ($RightGroup) {
+                    $forceDelete->addExtraClass('default-position');
                 }
             }
         }

@@ -16,8 +16,10 @@
         }
     ],
     "require": {
-        "php": ">=5.6",
-        "silverstripe/framework": "^4.0"
+        "php": ">=7.2",
+        "silverstripe/recipe-plugin": "^1",
+        "silverstripe/recipe-cms": "^4.4",
+        "lekoala/silverstripe-cms-actions": "*"
     },
     "extra": {
         "installer-name": "softdelete"
