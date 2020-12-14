@@ -1,5 +1,6 @@
 <?php
 
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\ORM\ManyManyList;
 use SilverStripe\ORM\ValidationException;
@@ -96,10 +97,19 @@ class GridFieldSoftDeleteAction implements GridField_ColumnProvider, GridField_A
             array('RecordID' => $record->ID)
         )
             ->addExtraClass('gridfield-button-delete btn--icon-md font-icon-trash-bin btn--no-text grid-field__icon-action')
-            ->setAttribute('title', _t(__class__ . '.Delete', "Delete"))
-            ->setDescription(_t(__class__ . '.DELETE_DESCRIPTION', 'Delete'));
+            ->setAttribute('title', _t(__CLASS__ . '.Delete', "Delete"))
+            ->setDescription(_t(__CLASS__ . '.DELETE_DESCRIPTION', 'Delete'));
 
         return $field->Field();
+    }
+
+    /**
+     * @param GridField $gridField
+     * @return DataList
+     */
+    protected function getListFromGridField($gridField)
+    {
+        return $gridField->getList();
     }
 
     /**
@@ -118,7 +128,7 @@ class GridFieldSoftDeleteAction implements GridField_ColumnProvider, GridField_A
         $data
     ) {
         if ($actionName == 'softdeleterecord') {
-            $item = $gridField->getList()->byID($arguments['RecordID']);
+            $item = $this->getListFromGridField($gridField)->byID($arguments['RecordID']);
             if (!$item) {
                 return;
             }

@@ -7,8 +7,10 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Security\Member;
 use SilverStripe\ORM\DataExtension;
 use LeKoala\CmsActions\CustomAction;
+use SilverStripe\Control\Controller;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\ORM\Queries\SQLSelect;
+use SilverStripe\Admin\CMSProfileController;
 
 /**
  * Soft delete extension
@@ -134,6 +136,14 @@ class SoftDeletable extends DataExtension
         if (!$this->owner->ID) {
             return;
         }
+
+        // Hide on ProfileController
+        if (Controller::has_curr()) {
+            if (Controller::curr() instanceof CMSProfileController) {
+                return;
+            }
+        }
+
         if ($this->owner->Deleted) {
             $undoDelete = new CustomAction('undoDelete', 'Undo Delete');
             $actions->push($undoDelete);
