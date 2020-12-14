@@ -7,10 +7,10 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Security\Member;
 use SilverStripe\ORM\DataExtension;
 use LeKoala\CmsActions\CustomAction;
+use SilverStripe\Admin\CMSProfileController;
 use SilverStripe\Control\Controller;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\ORM\Queries\SQLSelect;
-use SilverStripe\Admin\CMSProfileController;
 
 /**
  * Soft delete extension
@@ -177,29 +177,17 @@ class SoftDeletable extends DataExtension
             if ($deleteAction) {
                 $actions->remove($deleteAction);
             }
-            if ($RightGroup) {
-                // Move at the end of the stack
-                $actions->remove($softDelete);
-                $actions->push($softDelete);
-                // Without this positionning fails and button is stuck near +
-                if ($RightGroup) {
-                    $softDelete->addExtraClass('default-position');
-                }
-            }
+            // Move at the end of the stack
+            $actions->remove($softDelete);
+            $actions->push($softDelete);
         }
         if ($forceDelete) {
             if ($deleteAction) {
                 $actions->remove($deleteAction);
             }
-            if ($RightGroup) {
-                // Move at the end of the stack
-                $actions->remove($forceDelete);
-                $actions->push($forceDelete);
-                // Without this positionning fails and button is stuck near +
-                if ($RightGroup) {
-                    $forceDelete->addExtraClass('default-position');
-                }
-            }
+            // Move at the end of the stack
+            $actions->remove($forceDelete);
+            $actions->push($forceDelete);
         }
     }
 
