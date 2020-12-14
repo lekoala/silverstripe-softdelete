@@ -7,7 +7,7 @@ Soft delete will follow the same permissions patterns as delete.
 
 ModelAdmin and SecurityAdmin are extended to add a new GridField action that replace the default delete action
 
-BetterButtons are supported as well.
+This module depends on [lekoala/silverstripe-cms-actions](https://github.com/lekoala/silverstripe-cms-actions) for displaying delete buttons
 
 How to use
 ==================
@@ -58,7 +58,7 @@ Or at query level
 
 Compatibility
 ==================
-Tested with 4.x
+Tested with 4.4+
 
 Maintainer
 ==================
