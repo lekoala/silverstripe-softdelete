@@ -144,6 +144,11 @@ class SoftDeletable extends DataExtension
             }
         }
 
+        // Use canDelete
+        if (!$this->owner->canDelete()) {
+            return;
+        }
+
         if ($this->owner->Deleted) {
             $undoDelete = new CustomAction('undoDelete', 'Undo Delete');
             $actions->push($undoDelete);
