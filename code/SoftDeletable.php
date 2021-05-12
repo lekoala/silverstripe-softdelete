@@ -10,6 +10,7 @@ use LeKoala\CmsActions\CustomAction;
 use SilverStripe\Admin\CMSProfileController;
 use SilverStripe\Control\Controller;
 use SilverStripe\Forms\CheckboxField;
+use SilverStripe\ORM\Filters\PartialMatchFilter;
 use SilverStripe\ORM\Queries\SQLSelect;
 
 /**

@@ -18,4 +18,7 @@ After: '#coresearchfilters'
 SilverStripe\Core\Injector\Injector:
   DataListFilter.SoftDelete:
     class: SoftDeleteSearchFilter
+  DataListFilter.SoftDeleteSearch:
+    class: SoftDeleteSearchFilter
   SoftDeleteSearchFilter: '%$DataListFilter.SoftDelete'
+  SoftDeleteSearch: '%$DataListFilter.SoftDelete'
