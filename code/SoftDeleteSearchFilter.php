@@ -1,5 +1,6 @@
 <?php
 
+use SilverStripe\ORM\DataObjectSchema;
 use SilverStripe\ORM\DataQuery;
 use SilverStripe\ORM\Filters\SearchFilter;
 
@@ -28,10 +29,12 @@ class SoftDeleteSearchFilter extends SearchFilter
     protected function applyOne(DataQuery $query)
     {
         $this->model = $query->applyRelation($this->relation);
+        $schema = DataObjectSchema::singleton();
+        $tableName = $schema->tableName($this->model);
 
         $query = $query->setQueryParam("SoftDeletable.filter", false);
         if ($this->getOnlyDeleted() || $this->name == "OnlyDeleted") {
-            $query = $query->where("Deleted IS NOT NULL");
+            $query = $query->where("\"$tableName\".\"Deleted\" IS NOT NULL");
         }
 
         return $query;
@@ -40,10 +43,12 @@ class SoftDeleteSearchFilter extends SearchFilter
     protected function applyMany(DataQuery $query)
     {
         $this->model = $query->applyRelation($this->relation);
+        $schema = DataObjectSchema::singleton();
+        $tableName = $schema->tableName($this->model);
 
         $query = $query->setQueryParam("SoftDeletable.filter", false);
         if ($this->getOnlyDeleted() || $this->name == "OnlyDeleted") {
-            $query = $query->where("Deleted IS NOT NULL");
+            $query = $query->where("\"$tableName\".\"Deleted\" IS NOT NULL");
         }
 
         return $query;
@@ -52,10 +57,12 @@ class SoftDeleteSearchFilter extends SearchFilter
     protected function excludeOne(DataQuery $query)
     {
         $this->model = $query->applyRelation($this->relation);
+        $schema = DataObjectSchema::singleton();
+        $tableName = $schema->tableName($this->model);
 
         $query = $query->setQueryParam("SoftDeletable.filter", true);
         if ($this->getOnlyDeleted() || $this->name == "OnlyDeleted") {
-            $query = $query->where("Deleted IS NULL");
+            $query = $query->where("\"$tableName\".\"Deleted\" IS NULL");
         }
 
         return $query;
@@ -64,10 +71,12 @@ class SoftDeleteSearchFilter extends SearchFilter
     protected function excludeMany(DataQuery $query)
     {
         $this->model = $query->applyRelation($this->relation);
+        $schema = DataObjectSchema::singleton();
+        $tableName = $schema->tableName($this->model);
 
         $query = $query->setQueryParam("SoftDeletable.filter", true);
         if ($this->getOnlyDeleted() || $this->name == "OnlyDeleted") {
-            $query = $query->where("Deleted IS NULL");
+            $query = $query->where("\"$tableName\".\"Deleted\" IS NULL");
         }
 
         return $query;
