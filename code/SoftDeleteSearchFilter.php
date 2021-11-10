@@ -30,7 +30,7 @@ class SoftDeleteSearchFilter extends SearchFilter
     {
         $this->model = $query->applyRelation($this->relation);
         $schema = DataObjectSchema::singleton();
-        $tableName = $schema->tableName($this->model);
+        $tableName = $schema->tableForField($this->model, 'Deleted');
 
         $query = $query->setQueryParam("SoftDeletable.filter", false);
         if ($this->getOnlyDeleted() || $this->name == "OnlyDeleted") {
@@ -44,7 +44,7 @@ class SoftDeleteSearchFilter extends SearchFilter
     {
         $this->model = $query->applyRelation($this->relation);
         $schema = DataObjectSchema::singleton();
-        $tableName = $schema->tableName($this->model);
+        $tableName = $schema->tableForField($this->model, 'Deleted');
 
         $query = $query->setQueryParam("SoftDeletable.filter", false);
         if ($this->getOnlyDeleted() || $this->name == "OnlyDeleted") {
@@ -58,7 +58,7 @@ class SoftDeleteSearchFilter extends SearchFilter
     {
         $this->model = $query->applyRelation($this->relation);
         $schema = DataObjectSchema::singleton();
-        $tableName = $schema->tableName($this->model);
+        $tableName = $schema->tableForField($this->model, 'Deleted');
 
         $query = $query->setQueryParam("SoftDeletable.filter", true);
         if ($this->getOnlyDeleted() || $this->name == "OnlyDeleted") {
@@ -72,7 +72,7 @@ class SoftDeleteSearchFilter extends SearchFilter
     {
         $this->model = $query->applyRelation($this->relation);
         $schema = DataObjectSchema::singleton();
-        $tableName = $schema->tableName($this->model);
+        $tableName = $schema->tableForField($this->model, 'Deleted');
 
         $query = $query->setQueryParam("SoftDeletable.filter", true);
         if ($this->getOnlyDeleted() || $this->name == "OnlyDeleted") {
