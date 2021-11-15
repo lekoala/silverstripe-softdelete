@@ -76,13 +76,12 @@ class SoftDeletable extends DataExtension
   ...
         */
         $fields['IncludeDeleted'] = [
-            'filter' => 'SoftDeleteSearchFilter',
+            'filter' => SoftDeleteSearchFilter::class,
             'field' => CheckboxField::class,
             'title' => 'Include deleted',
         ];
-        // Can can declare search filters instance directly with our modifier
         $fields['OnlyDeleted'] = [
-            'filter' => new SoftDeleteSearchFilter('Deleted', 1, ['only']),
+            'filter' => SoftDeleteOnlySearchFilter::class,
             'field' => CheckboxField::class,
             'title' => 'Only deleted',
         ];

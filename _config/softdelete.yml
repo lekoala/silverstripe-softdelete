@@ -13,12 +13,18 @@ SilverStripe\Admin\SecurityAdmin:
     - SoftDeleteSecurityAdmin
 ---
 Name: softdelete-searchfilters
-After: '#coresearchfilters'
+After: "#coresearchfilters"
 ---
 SilverStripe\Core\Injector\Injector:
   DataListFilter.SoftDelete:
     class: SoftDeleteSearchFilter
   DataListFilter.SoftDeleteSearch:
     class: SoftDeleteSearchFilter
-  SoftDeleteSearchFilter: '%$DataListFilter.SoftDelete'
-  SoftDeleteSearch: '%$DataListFilter.SoftDelete'
+  DataListFilter.SoftDeleteOnly:
+    class: SoftDeleteOnlySearchFilter
+  DataListFilter.SoftDeleteOnlySearch:
+    class: SoftDeleteOnlySearchFilter
+  SoftDeleteSearchFilter: "%$DataListFilter.SoftDelete"
+  SoftDeleteSearch: "%$DataListFilter.SoftDelete"
+  SoftDeleteOnlySearchFilter: "%$DataListFilter.SoftDeleteOnly"
+  SoftDeleteOnlySearch: "%$DataListFilter.SoftDeleteOnly"
