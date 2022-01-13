@@ -164,6 +164,9 @@ class SoftDeletable extends DataExtension
             $softDelete->addExtraClass('btn-hide-outline');
             $softDelete->addExtraClass('font-icon-trash-bin');
             $actions->push($softDelete);
+            if ($this->owner->hasMethod('getDeleteButtonTitle')) {
+                $softDelete->setTitle($this->owner->getDeleteButtonTitle());
+            }
         }
     }
 
