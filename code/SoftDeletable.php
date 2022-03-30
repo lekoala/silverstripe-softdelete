@@ -7,10 +7,8 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Security\Member;
 use SilverStripe\ORM\DataExtension;
 use LeKoala\CmsActions\CustomAction;
-use SilverStripe\Admin\CMSProfileController;
 use SilverStripe\Control\Controller;
 use SilverStripe\Forms\CheckboxField;
-use SilverStripe\ORM\Filters\PartialMatchFilter;
 use SilverStripe\ORM\Queries\SQLSelect;
 
 /**
@@ -139,7 +137,8 @@ class SoftDeletable extends DataExtension
 
         // Hide on ProfileController
         if (Controller::has_curr()) {
-            if (Controller::curr() instanceof CMSProfileController) {
+            $className = get_class(Controller::curr());
+            if (strpos($className, 'CMSProfileController') !== false) {
                 return;
             }
         }
