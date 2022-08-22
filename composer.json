@@ -21,6 +21,13 @@
         "silverstripe/recipe-cms": "^4.4",
         "lekoala/silverstripe-cms-actions": "*"
     },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true,
+            "silverstripe/recipe-plugin": true,
+            "silverstripe/vendor-plugin": true
+        }
+    },
     "extra": {
         "installer-name": "softdelete"
     },
