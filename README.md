@@ -71,7 +71,7 @@ An alternative option, is to disable that feature:
 
 ```yml
 SoftDeletable:
-  filters_on_id: true
+  check_filters_on_id: false
 ```
 
 Keep in mind that `DataObject::get_by_id();` can get cached and it can lead to tricky scenarios.

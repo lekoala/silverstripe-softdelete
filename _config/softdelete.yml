@@ -2,7 +2,7 @@
 Name: softdelete
 ---
 SoftDeletable:
-  filters_on_id: true
+  check_filters_on_id: true
 SilverStripe\Admin\ModelAdmin:
   softdelete_from_list: true
   softdelete_from_list_exclude: []
