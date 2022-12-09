@@ -8,6 +8,7 @@ use SilverStripe\Security\Member;
 use SilverStripe\ORM\DataExtension;
 use LeKoala\CmsActions\CustomAction;
 use SilverStripe\Control\Controller;
+use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\ORM\Queries\SQLSelect;
 
@@ -22,6 +23,8 @@ use SilverStripe\ORM\Queries\SQLSelect;
  */
 class SoftDeletable extends DataExtension
 {
+    use Configurable;
+
     /**
      * Disable the filtering
      *
@@ -99,7 +102,7 @@ class SoftDeletable extends DataExtension
             return;
         }
         // Don't run if querying by ID
-        if ($query->filtersOnID()) {
+        if ($query->filtersOnID() && self::config()->filters_on_id) {
             return;
         }
 
