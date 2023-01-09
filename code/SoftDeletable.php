@@ -80,11 +80,13 @@ class SoftDeletable extends DataExtension
             'filter' => SoftDeleteSearchFilter::class,
             'field' => CheckboxField::class,
             'title' => 'Include deleted',
+            'general' => false, //4.12+
         ];
         $fields['OnlyDeleted'] = [
             'filter' => SoftDeleteOnlySearchFilter::class,
             'field' => CheckboxField::class,
             'title' => 'Only deleted',
+            'general' => false, //4.12+
         ];
     }
 
