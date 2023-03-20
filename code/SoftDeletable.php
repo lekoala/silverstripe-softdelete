@@ -103,14 +103,22 @@ class SoftDeletable extends DataExtension
         if ($dataQuery->getQueryParam('SoftDeletable.filter') === false) {
             return;
         }
-        // Don't run if querying by ID
-        if ($query->filtersOnID() && self::config()->check_filters_on_id) {
-            return;
-        }
 
         $froms = $query->getFrom();
         $froms = array_keys($froms);
         $tableName = array_shift($froms);
+
+        // Don't run if querying by ID on base table because it's much more convenient
+        // Don't use filtersOnID as it will return true when filtering a relation by ID as well
+        if (self::config()->check_filters_on_id) {
+            foreach ($query->getWhereParameterised($parameters) as $predicate) {
+                $filtered = str_replace(['"', '`', ' ', 'IN'], ['', '', '', '='], $predicate);
+                // Where must contain a clause with Table.ID = or Table.ID IN
+                if (strpos($filtered, $tableName . ".ID=") === 0) {
+                    return;
+                }
+            }
+        }
         $query->addWhere("\"$tableName\".\"Deleted\" IS NULL");
     }
 
