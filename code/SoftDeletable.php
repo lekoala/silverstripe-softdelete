@@ -104,7 +104,8 @@ class SoftDeletable extends DataExtension
             return;
         }
         // Don't run if querying by ID
-        if ($query->filtersOnID() && self::config()->check_filters_on_id) {
+        if ($query->filtersOnID() && self::config()->check_filters_on_id
+        && count($queriedTables = $query->queriedTables()) === 1 && $queriedTables[0] === $this->owner::class) {
             return;
         }
 
