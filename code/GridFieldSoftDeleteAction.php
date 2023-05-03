@@ -143,7 +143,12 @@ class GridFieldSoftDeleteAction implements GridField_ColumnProvider, GridField_A
                 );
             }
 
-            $item->softDelete();
+            // If you replaced by mistake, it should still delete
+            if ($item->hasMethod('softDelete')) {
+                $item->softDelete();
+            } else {
+                $item->delete();
+            }
 
             $list = $gridField->getList();
             // Remove from the list if it's a non destructive operation
