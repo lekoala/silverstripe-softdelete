@@ -1,9 +1,7 @@
 <?php
 
-use SilverStripe\ORM\DataQuery;
 use SilverStripe\Core\Extension;
-use SilverStripe\Forms\CheckboxField;
-use SilverStripe\Forms\GridField\GridFieldDataColumns;
+use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldDeleteAction;
 
 /**
@@ -25,15 +23,17 @@ class SoftDeleteModelAdmin extends Extension
         $singl = singleton($this->owner->modelClass);
 
         if ($singl->hasExtension(SoftDeletable::class)) {
-            /* @var $gridfield GridField */
+            /** @var GridField $gridfield */
             $gridfield = $form->Fields()->dataFieldByName($this->getSanistedModelClass());
-            $config = $gridfield->getConfig();
+            if ($gridfield) {
+                $config = $gridfield->getConfig();
 
-            $config->removeComponentsByType(GridFieldDeleteAction::class);
-            if ($this->owner->config()->softdelete_from_list) {
-                $exclude = $this->owner->config()->softdelete_from_list_exclude;
-                if ($exclude && !in_array($this->owner->modelClass, $exclude)) {
-                    $config->addComponent(new GridFieldSoftDeleteAction());
+                $config->removeComponentsByType(GridFieldDeleteAction::class);
+                if ($this->owner->config()->softdelete_from_list) {
+                    $exclude = $this->owner->config()->softdelete_from_list_exclude;
+                    if ($exclude && !in_array($this->owner->modelClass, $exclude)) {
+                        $config->addComponent(new GridFieldSoftDeleteAction());
+                    }
                 }
             }
         }
