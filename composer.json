@@ -16,9 +16,10 @@
         }
     ],
     "require": {
-        "php": ">=7.2",
-        "silverstripe/recipe-plugin": "^1",
-        "silverstripe/recipe-cms": "^4.4",
+        "php": "^7.4 || ^8",
+        "silverstripe/recipe-plugin": "^1 || ^2",
+        "silverstripe/vendor-plugin": "^1 || ^2",
+        "silverstripe/framework": "^4.4 || ^5",
         "lekoala/silverstripe-cms-actions": "*"
     },
     "config": {
