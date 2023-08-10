@@ -38,27 +38,39 @@ class SoftDeleteSecurityAdmin extends Extension
 
         if ($memberSingl->hasExtension('SoftDeletable')) {
             $gridfield = $form->Fields()->dataFieldByName('Members');
-            $config = $gridfield->getConfig();
-
-            $config->removeComponentsByType(GridFieldDeleteAction::class);
-            if ($this->owner->config()->softdelete_from_list) {
-                $exclude = $this->owner->config()->softdelete_from_list_exclude;
-                if ($exclude && !in_array($this->owner->modelClass, $exclude)) {
-                    $config->addComponent(new GridFieldSoftDeleteAction());
-                }
+            //SS5 compat
+            if (!$gridfield) {
+                $gridfield = $form->Fields()->dataFieldByName('users');
             }
+            if ($gridfield) {
+                $config = $gridfield->getConfig();
 
-            // No caution because soft :-)
-            $form->Fields()->removeByName('MembersCautionText');
+                $config->removeComponentsByType(GridFieldDeleteAction::class);
+                if ($this->owner->config()->softdelete_from_list) {
+                    $exclude = $this->owner->config()->softdelete_from_list_exclude;
+                    if ($exclude && !in_array($this->owner->modelClass, $exclude)) {
+                        $config->addComponent(new GridFieldSoftDeleteAction());
+                    }
+                }
+
+                // No caution because soft :-)
+                $form->Fields()->removeByName('MembersCautionText');
+            }
         }
 
         if ($groupSingl->hasExtension('SoftDeletable')) {
             $gridfield = $form->Fields()->dataFieldByName('Groups');
-            $config = $gridfield->getConfig();
+            //SS5 compat
+            if (!$gridfield) {
+                $gridfield = $form->Fields()->dataFieldByName('groups');
+            }
+            if ($gridfield) {
+                $config = $gridfield->getConfig();
 
-            $config->removeComponentsByType(GridFieldDeleteAction::class);
-            if ($this->owner->config()->softdelete_from_list) {
-                $config->addComponent(new GridFieldSoftDeleteAction());
+                $config->removeComponentsByType(GridFieldDeleteAction::class);
+                if ($this->owner->config()->softdelete_from_list) {
+                    $config->addComponent(new GridFieldSoftDeleteAction());
+                }
             }
         }
     }
