@@ -6,11 +6,12 @@ use SilverStripe\ORM\DataObject;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Security\Member;
 use SilverStripe\ORM\DataExtension;
+use SilverStripe\Security\Security;
 use LeKoala\CmsActions\CustomAction;
 use SilverStripe\Control\Controller;
-use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\ORM\Queries\SQLSelect;
+use SilverStripe\Core\Config\Configurable;
 
 /**
  * Soft delete extension
@@ -254,8 +255,12 @@ class SoftDeletable extends DataExtension
             throw new LogicException("DataObject::softDelete() called on a DataObject without an ID");
         }
 
+        $member = Security::getCurrentUser();
+
         $this->owner->Deleted = date('Y-m-d H:i:s');
-        $this->owner->DeletedByID = Member::currentUserID();
+        if ($member) {
+            $this->owner->DeletedByID = $member->ID;
+        }
         $this->owner->write();
 
         $this->owner->extend('onAfterSoftDelete', $this->owner);

@@ -15,22 +15,9 @@ use SilverStripe\Forms\GridField\GridFieldDeleteAction;
  */
 class SoftDeleteSecurityAdmin extends Extension
 {
-    protected function getSanistedClass($class)
+    public function updateEditForm(Form $form)
     {
-        return str_replace('\\', '-', $class);
-    }
-
-    /**
-     * @return SecurityAdmin
-     */
-    protected function getSecurityAdmin()
-    {
-        return $this->owner;
-    }
-
-    function updateEditForm(Form $form)
-    {
-        /* @var $owner SecurityAdmin */
+        /** @var SecurityAdmin $owner */
         $owner = $this->owner;
 
         $memberSingl = singleton(Member::class);
@@ -46,7 +33,7 @@ class SoftDeleteSecurityAdmin extends Extension
                 $config = $gridfield->getConfig();
 
                 $config->removeComponentsByType(GridFieldDeleteAction::class);
-                if ($this->owner->config()->softdelete_from_list) {
+                if ($owner::config()->softdelete_from_list) {
                     $exclude = $this->owner->config()->softdelete_from_list_exclude;
                     if ($exclude && !in_array($this->owner->modelClass, $exclude)) {
                         $config->addComponent(new GridFieldSoftDeleteAction());
@@ -68,7 +55,7 @@ class SoftDeleteSecurityAdmin extends Extension
                 $config = $gridfield->getConfig();
 
                 $config->removeComponentsByType(GridFieldDeleteAction::class);
-                if ($this->owner->config()->softdelete_from_list) {
+                if ($owner::config()->softdelete_from_list) {
                     $config->addComponent(new GridFieldSoftDeleteAction());
                 }
             }
