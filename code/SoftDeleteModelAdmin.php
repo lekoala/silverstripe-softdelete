@@ -17,7 +17,7 @@ class SoftDeleteModelAdmin extends Extension
 
     protected function getSanistedModelClass()
     {
-        return str_replace('\\', '-', $this->owner->modelClass);
+        return str_replace('\\', '-', $this->owner->modelTab);
     }
 
     public function updateEditForm($form)
