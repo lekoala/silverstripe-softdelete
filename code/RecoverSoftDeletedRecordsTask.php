@@ -1,17 +1,33 @@
 <?php
 
-use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DB;
+use SilverStripe\Dev\BuildTask;
+use SilverStripe\Control\HTTPRequest;
 
 /**
  * @author Koala
  */
 class RecoverSoftDeletedRecordsTask extends BuildTask
 {
+    /**
+     * @var string
+     */
     private static $segment = 'RecoverSoftDeletedRecordsTask';
+
+    /**
+     * @var string
+     */
     protected $title = 'Recover or Clean Soft Deleted Records';
+
+    /**
+     * @var string
+     */
     protected $description = 'Helps you to track and potentially recover or clean up any soft deleted record';
 
+    /**
+     * @param HTTPRequest $request
+     * @return void
+     */
     public function run($request)
     {
         $classes = SoftDeletable::listSoftDeletableClasses();
@@ -21,8 +37,11 @@ class RecoverSoftDeletedRecordsTask extends BuildTask
             return;
         }
 
+        /** @var ?string $selectedClass */
         $selectedClass = $request->getVar('class');
+        /** @var ?string $recover */
         $recover = $request->getVar('recover');
+        /** @var ?string $cleanup */
         $cleanup = $request->getVar('cleanup');
 
         if (!$selectedClass) {
@@ -49,6 +68,7 @@ class RecoverSoftDeletedRecordsTask extends BuildTask
 
         $toRecover = array();
         if ($recover) {
+            //@phpstan-ignore-next-line
             if ($recover == 'all' || $cleanup) {
                 // keep all
             } else {

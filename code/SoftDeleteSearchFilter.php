@@ -9,6 +9,9 @@ use SilverStripe\ORM\Filters\SearchFilter;
  */
 class SoftDeleteSearchFilter extends SearchFilter
 {
+    /**
+     * @return array<string>
+     */
     public function getSupportedModifiers()
     {
         return ['only'];
@@ -32,7 +35,7 @@ class SoftDeleteSearchFilter extends SearchFilter
         $schema = DataObjectSchema::singleton();
         $tableName = $schema->tableForField($this->model, 'Deleted');
 
-        $query = $query->setQueryParam("SoftDeletable.filter", false);
+        $query = $query->setQueryParam("SoftDeletable.filter", 'false');
         if ($this->getOnlyDeleted() || $this->name == "OnlyDeleted") {
             $query = $query->where("\"$tableName\".\"Deleted\" IS NOT NULL");
         }
@@ -46,7 +49,7 @@ class SoftDeleteSearchFilter extends SearchFilter
         $schema = DataObjectSchema::singleton();
         $tableName = $schema->tableForField($this->model, 'Deleted');
 
-        $query = $query->setQueryParam("SoftDeletable.filter", false);
+        $query = $query->setQueryParam("SoftDeletable.filter", 'false');
         if ($this->getOnlyDeleted() || $this->name == "OnlyDeleted") {
             $query = $query->where("\"$tableName\".\"Deleted\" IS NOT NULL");
         }
@@ -60,7 +63,7 @@ class SoftDeleteSearchFilter extends SearchFilter
         $schema = DataObjectSchema::singleton();
         $tableName = $schema->tableForField($this->model, 'Deleted');
 
-        $query = $query->setQueryParam("SoftDeletable.filter", true);
+        $query = $query->setQueryParam("SoftDeletable.filter", 'false');
         if ($this->getOnlyDeleted() || $this->name == "OnlyDeleted") {
             $query = $query->where("\"$tableName\".\"Deleted\" IS NULL");
         }
@@ -74,7 +77,7 @@ class SoftDeleteSearchFilter extends SearchFilter
         $schema = DataObjectSchema::singleton();
         $tableName = $schema->tableForField($this->model, 'Deleted');
 
-        $query = $query->setQueryParam("SoftDeletable.filter", true);
+        $query = $query->setQueryParam("SoftDeletable.filter", 'false');
         if ($this->getOnlyDeleted() || $this->name == "OnlyDeleted") {
             $query = $query->where("\"$tableName\".\"Deleted\" IS NULL");
         }
@@ -82,8 +85,13 @@ class SoftDeleteSearchFilter extends SearchFilter
         return $query;
     }
 
+    /**
+     * @return boolean
+     */
     public function isEmpty()
     {
-        return $this->getValue() === array() || $this->getValue() === null || $this->getValue() === '';
+        /** @var null|array<mixed>|string $v */
+        $v = $this->getValue();
+        return $v === array() || $v === null || $v === '';
     }
 }

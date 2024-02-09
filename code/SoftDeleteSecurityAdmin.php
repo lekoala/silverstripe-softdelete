@@ -15,6 +15,10 @@ use SilverStripe\Forms\GridField\GridFieldDeleteAction;
  */
 class SoftDeleteSecurityAdmin extends Extension
 {
+    /**
+     * @param Form $form
+     * @return void
+     */
     public function updateEditForm(Form $form)
     {
         /** @var SecurityAdmin $owner */
@@ -24,9 +28,11 @@ class SoftDeleteSecurityAdmin extends Extension
         $groupSingl = singleton(Group::class);
 
         if ($memberSingl->hasExtension('SoftDeletable')) {
+            /** @var GridField|null $gridfield */
             $gridfield = $form->Fields()->dataFieldByName('Members');
             //SS5 compat
             if (!$gridfield) {
+                /** @var GridField|null $gridfield */
                 $gridfield = $form->Fields()->dataFieldByName('users');
             }
             if ($gridfield) {
@@ -49,9 +55,11 @@ class SoftDeleteSecurityAdmin extends Extension
             $gridfield = $form->Fields()->dataFieldByName('Groups');
             //SS5 compat
             if (!$gridfield) {
+                /** @var GridField|null $gridfield */
                 $gridfield = $form->Fields()->dataFieldByName('groups');
             }
             if ($gridfield) {
+                /** @var GridField|null $gridfield */
                 $config = $gridfield->getConfig();
 
                 $config->removeComponentsByType(GridFieldDeleteAction::class);

@@ -17,10 +17,9 @@ use SilverStripe\Core\Config\Configurable;
  * Soft delete extension
  *
  * @author Koala
- * @property Member|SoftDeletable $owner
+ * @property DataObject|SoftDeletable $owner
  * @property string $Deleted
  * @property int $DeletedByID
- * @method Member DeletedBy()
  */
 class SoftDeletable extends DataExtension
 {
@@ -40,19 +39,28 @@ class SoftDeletable extends DataExtension
      */
     public static $prevent_delete = true;
 
+    /**
+     * @var array<string,string>
+     */
     private static $db = array(
         'Deleted' => "Datetime",
         'DeletedByID' => "Int", // Somehow relation to member class causes circular dependency
     );
+    /**
+     * @var array<string,string>
+     */
     private static $has_one = array(
         // 'DeletedBy' => Member::class
     );
+    /**
+     * @var array<string,string>
+     */
     private static $defaults = array(
         'DeletedByID' => '-1' // Use -1 to distinguish null from 0
     );
 
     /**
-     * @return array
+     * @return array<int|string,string|mixed>
      */
     public static function listSoftDeletableClasses()
     {
@@ -67,6 +75,10 @@ class SoftDeletable extends DataExtension
         return $arr;
     }
 
+    /**
+     * @param array<string,mixed> $fields
+     * @return void
+     */
     public function updateSearchableFields(array &$fields)
     {
         /*
@@ -93,6 +105,7 @@ class SoftDeletable extends DataExtension
 
     /**
      * Update any requests to hide deleted records
+     * @return void
      */
     public function augmentSQL(SQLSelect $query, DataQuery $dataQuery = null)
     {
@@ -101,8 +114,12 @@ class SoftDeletable extends DataExtension
             return;
         }
         // Filters are disabled for this query
-        if ($dataQuery->getQueryParam('SoftDeletable.filter') === false) {
-            return;
+        if ($dataQuery) {
+            /** @var string|bool $filter */
+            $filter = $dataQuery->getQueryParam('SoftDeletable.filter');
+            if ($filter == false || $filter == 'false') {
+                return;
+            }
         }
 
         $froms = $query->getFrom();
@@ -123,8 +140,13 @@ class SoftDeletable extends DataExtension
         $query->addWhere("\"$tableName\".\"Deleted\" IS NULL");
     }
 
+    /**
+     * @param FieldList $fields
+     * @return void
+     */
     public function updateCMSFields(FieldList $fields)
     {
+        //@phpstan-ignore-next-line
         if (!$this->owner->Deleted) {
             $fields->removeByName('Deleted');
             $fields->removeByName('DeletedByID');
@@ -142,6 +164,10 @@ class SoftDeletable extends DataExtension
         }
     }
 
+    /**
+     * @param FieldList $actions
+     * @return void
+     */
     public function updateCMSActions(FieldList $actions)
     {
         // Hide delete for new records
@@ -177,7 +203,10 @@ class SoftDeletable extends DataExtension
             $softDelete->addExtraClass('btn-hide-outline');
             $softDelete->addExtraClass('font-icon-trash-bin');
             $actions->push($softDelete);
+
+            //@phpstan-ignore-next-line
             if ($this->owner->hasMethod('getDeleteButtonTitle')) {
+                //@phpstan-ignore-next-line
                 $softDelete->setTitle($this->owner->getDeleteButtonTitle());
             }
         }
@@ -212,6 +241,9 @@ class SoftDeletable extends DataExtension
         }
     }
 
+    /**
+     * @return void
+     */
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
@@ -220,7 +252,7 @@ class SoftDeletable extends DataExtension
         if ($this->owner instanceof Member && $this->owner->Email) {
             $list = Member::get()->filter('Email', $this->owner->Email)->exclude('ID', $this->owner->ID);
             $list = $list->alterDataQuery(function (DataQuery $dq) {
-                $dq->setQueryParam('SoftDeletable.filter', false);
+                $dq->setQueryParam('SoftDeletable.filter', 'false');
             });
             $count = $list->count();
             if ($count > 1) {
@@ -229,6 +261,9 @@ class SoftDeletable extends DataExtension
         }
     }
 
+    /**
+     * @return void
+     */
     public function onBeforeDelete()
     {
         if (self::$prevent_delete) {
@@ -244,26 +279,30 @@ class SoftDeletable extends DataExtension
      */
     public function softDelete()
     {
-        if ($this->owner->Deleted) {
+        /** @var DataObject $owner */
+        $owner = $this->owner;
+        if ($owner->Deleted) {
             throw new LogicException("DataObject::softDelete() called on a DataObject already soft deleted");
         }
-        $result = $this->owner->extend('onBeforeSoftDelete', $this->owner);
-        if ($result === false) {
-            return;
+        $result = $owner->extend('onBeforeSoftDelete', $this->owner);
+        foreach ($result as $resultRow) {
+            if ($resultRow === false) {
+                return;
+            }
         }
-        if (!$this->owner->ID) {
+
+        if (!$owner->ID) {
             throw new LogicException("DataObject::softDelete() called on a DataObject without an ID");
         }
 
         $member = Security::getCurrentUser();
-
-        $this->owner->Deleted = date('Y-m-d H:i:s');
+        $owner->Deleted = date('Y-m-d H:i:s');
         if ($member) {
-            $this->owner->DeletedByID = $member->ID;
+            $owner->DeletedByID = $member->ID;
         }
-        $this->owner->write();
+        $owner->write();
 
-        $this->owner->extend('onAfterSoftDelete', $this->owner);
+        $owner->extend('onAfterSoftDelete', $owner);
     }
 
     /**
@@ -273,9 +312,11 @@ class SoftDeletable extends DataExtension
      */
     public function undoDelete()
     {
-        $this->owner->Deleted = null;
-        $this->owner->DeletedByID = -1;
-        $this->owner->write();
+        /** @var DataObject $owner */
+        $owner = $this->owner;
+        $owner->Deleted = null;
+        $owner->DeletedByID = -1;
+        $owner->write();
     }
 
     /**
@@ -289,16 +330,19 @@ class SoftDeletable extends DataExtension
 
         self::$prevent_delete = false;
 
-        $result = $this->owner->delete();
+        /** @var DataObject $owner */
+        $owner = $this->owner;
+        $owner->delete();
 
         self::$prevent_delete = $status;
     }
 
     /**
-     * @return Member
+     * @return ?Member
      */
     public function DeletedBy()
     {
+        //@phpstan-ignore-next-line
         return DataObject::get_by_id(Member::class, $this->owner->DeletedByID);
     }
 }

@@ -5,6 +5,9 @@
  */
 class SoftDeleteOnlySearchFilter extends SoftDeleteSearchFilter
 {
+    /**
+     * @return array<string>
+     */
     public function getSupportedModifiers()
     {
         return [];

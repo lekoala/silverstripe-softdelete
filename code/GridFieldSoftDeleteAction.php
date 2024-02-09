@@ -1,9 +1,12 @@
 <?php
 
+use SilverStripe\ORM\SS_List;
 use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\HasManyList;
 use SilverStripe\ORM\ManyManyList;
 use SilverStripe\ORM\ValidationException;
+use SilverStripe\ORM\FieldType\DBHTMLText;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridField_FormAction;
 use SilverStripe\Forms\GridField\GridField_ActionProvider;
@@ -19,7 +22,8 @@ class GridFieldSoftDeleteAction implements GridField_ColumnProvider, GridField_A
      * Add a column 'Delete'
      *
      * @param GridField $gridField
-     * @param array $columns
+     * @param array<string> $columns
+     * @return void
      */
     public function augmentColumns($gridField, &$columns)
     {
@@ -34,7 +38,7 @@ class GridFieldSoftDeleteAction implements GridField_ColumnProvider, GridField_A
      * @param GridField $gridField
      * @param DataObject $record
      * @param string $columnName
-     * @return array
+     * @return array<string,string>
      */
     public function getColumnAttributes($gridField, $record, $columnName)
     {
@@ -46,20 +50,21 @@ class GridFieldSoftDeleteAction implements GridField_ColumnProvider, GridField_A
      *
      * @param GridField $gridField
      * @param string $columnName
-     * @return array
+     * @return array<string,string>|null
      */
     public function getColumnMetadata($gridField, $columnName)
     {
         if ($columnName == 'Actions') {
             return array('title' => '');
         }
+        return null;
     }
 
     /**
      * Which columns are handled by this component
      *
      * @param GridField $gridField
-     * @return array
+     * @return array<string>
      */
     public function getColumnsHandled($gridField)
     {
@@ -70,7 +75,7 @@ class GridFieldSoftDeleteAction implements GridField_ColumnProvider, GridField_A
      * Which GridField actions are this component handling
      *
      * @param GridField $gridField
-     * @return array
+     * @return array<string>
      */
     public function getActions($gridField)
     {
@@ -81,12 +86,12 @@ class GridFieldSoftDeleteAction implements GridField_ColumnProvider, GridField_A
      * @param GridField $gridField
      * @param DataObject $record
      * @param string $columnName
-     * @return string - the HTML for the column
+     * @return string|DBHTMLText|null - the HTML for the column
      */
     public function getColumnContent($gridField, $record, $columnName)
     {
         if (!$record->canDelete()) {
-            return;
+            return null;
         }
 
         $field = GridField_FormAction::create(
@@ -105,7 +110,7 @@ class GridFieldSoftDeleteAction implements GridField_ColumnProvider, GridField_A
 
     /**
      * @param GridField $gridField
-     * @return DataList
+     * @return DataList|SS_List
      */
     protected function getListFromGridField($gridField)
     {
@@ -118,7 +123,7 @@ class GridFieldSoftDeleteAction implements GridField_ColumnProvider, GridField_A
      * @param GridField $gridField
      * @param string $actionName
      * @param mixed $arguments
-     * @param array $data - form data
+     * @param array<mixed> $data - form data
      * @return void
      */
     public function handleAction(
@@ -128,7 +133,10 @@ class GridFieldSoftDeleteAction implements GridField_ColumnProvider, GridField_A
         $data
     ) {
         if ($actionName == 'softdeleterecord') {
-            $item = $this->getListFromGridField($gridField)->byID($arguments['RecordID']);
+            /** @var DataList $list */
+            $list = $this->getListFromGridField($gridField);
+            /** @var DataObject|null $item */
+            $item = $list->byID($arguments['RecordID']);
             if (!$item) {
                 return;
             }
@@ -145,6 +153,7 @@ class GridFieldSoftDeleteAction implements GridField_ColumnProvider, GridField_A
 
             // If you replaced by mistake, it should still delete
             if ($item->hasMethod('softDelete')) {
+                //@phpstan-ignore-next-line
                 $item->softDelete();
             } else {
                 $item->delete();

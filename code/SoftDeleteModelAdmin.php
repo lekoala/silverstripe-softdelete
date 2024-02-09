@@ -1,5 +1,6 @@
 <?php
 
+use SilverStripe\Forms\Form;
 use SilverStripe\Core\Extension;
 use SilverStripe\Admin\ModelAdmin;
 use SilverStripe\Admin\SecurityAdmin;
@@ -15,25 +16,33 @@ use SilverStripe\Forms\GridField\GridFieldDeleteAction;
 class SoftDeleteModelAdmin extends Extension
 {
 
+    /**
+     * @return string
+     */
     protected function getSanistedModelClass()
     {
-        return str_replace('\\', '-', $this->owner->modelTab);
+        return str_replace('\\', '-', $this->owner->getField('modelTab'));
     }
 
+    /**
+     * @param Form $form
+     * @return Form|null
+     */
     public function updateEditForm($form)
     {
-        $singl = singleton($this->owner->modelClass);
+        $modelClass = $this->owner->getModelClass();
+        $singl = singleton($modelClass);
 
         /** @var ModelAdmin|SecurityAdmin $owner */
         $owner = $this->owner;
 
         // Already done in own extension for SS5
         if ($owner instanceof SecurityAdmin) {
-            return;
+            return null;
         }
 
         if ($singl->hasExtension(SoftDeletable::class)) {
-            /** @var GridField $gridfield */
+            /** @var GridField|null $gridfield */
             $gridfield = $form->Fields()->dataFieldByName($this->getSanistedModelClass());
             if ($gridfield) {
                 $config = $gridfield->getConfig();
@@ -41,7 +50,7 @@ class SoftDeleteModelAdmin extends Extension
                 $config->removeComponentsByType(GridFieldDeleteAction::class);
                 if ($owner::config()->softdelete_from_list) {
                     $exclude = $this->owner->config()->softdelete_from_list_exclude;
-                    if ($exclude && !in_array($this->owner->modelClass, $exclude)) {
+                    if ($exclude && !in_array($modelClass, $exclude)) {
                         $config->addComponent(new GridFieldSoftDeleteAction());
                     }
                 }
