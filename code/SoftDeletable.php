@@ -117,7 +117,7 @@ class SoftDeletable extends DataExtension
         if ($dataQuery) {
             /** @var string|bool $filter */
             $filter = $dataQuery->getQueryParam('SoftDeletable.filter');
-            if ($filter == false || $filter == 'false') {
+            if ($filter === false || $filter === 'false') {
                 return;
             }
         }
