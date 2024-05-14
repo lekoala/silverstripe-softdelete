@@ -47,7 +47,10 @@ class SoftDeleteModelAdmin extends Extension
             if ($gridfield) {
                 $config = $gridfield->getConfig();
 
-                $config->removeComponentsByType(GridFieldDeleteAction::class);
+                $editable = $config->getComponentByType(\Symbiote\GridFieldExtensions\GridFieldEditableColumns::class);
+                if (!$editable) {
+                    $config->removeComponentsByType(GridFieldDeleteAction::class);
+                }
                 if ($owner::config()->softdelete_from_list) {
                     $exclude = $this->owner->config()->softdelete_from_list_exclude;
                     if ($exclude && !in_array($modelClass, $exclude)) {
