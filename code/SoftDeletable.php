@@ -99,7 +99,7 @@ class SoftDeletable extends Extension
      * Update any requests to hide deleted records
      * @return void
      */
-    public function augmentSQL(SQLSelect $query, DataQuery $dataQuery = null)
+    public function augmentSQL(SQLSelect $query, ?DataQuery $dataQuery = null)
     {
         // Filters are disabled globally
         if (self::$disable) {
