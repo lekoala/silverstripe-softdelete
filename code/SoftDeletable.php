@@ -168,11 +168,9 @@ class SoftDeletable extends Extension
         }
 
         // Hide on ProfileController
-        if (Controller::has_curr()) {
-            $className = get_class(Controller::curr());
-            if (strpos($className, 'CMSProfileController') !== false) {
-                return;
-            }
+        $curr = Controller::curr();
+        if ($curr && strpos(get_class($curr), 'CMSProfileController') !== false) {
+            return;
         }
 
         // Use canDelete
