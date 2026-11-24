@@ -236,7 +236,9 @@ class SoftDeletable extends Extension
      */
     public function onBeforeWrite()
     {
-        parent::onBeforeWrite();
+        // SS6: Core\Extension has no onBeforeWrite() (SS5's DataExtension had an empty stub), so this fataled
+        // on every write. Extension hooks are invoked per extension; there is no parent to chain to.
+        // parent::onBeforeWrite();
 
         // Check if this we could a duplicated email with a deleted member
         if ($this->owner instanceof Member && $this->owner->Email) {
@@ -259,7 +261,9 @@ class SoftDeletable extends Extension
         if (self::$prevent_delete) {
             throw new Exception("Tried to delete a DataObject, but data deletion is currently active");
         }
-        parent::onBeforeDelete();
+        // SS6: Core\Extension has no onBeforeDelete() (SS5's DataExtension had an empty stub), so this fataled
+        // on every delete. Extension hooks are invoked per extension; there is no parent to chain to.
+        // parent::onBeforeDelete();
     }
 
     /**
